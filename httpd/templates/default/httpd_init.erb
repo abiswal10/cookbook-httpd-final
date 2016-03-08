@@ -1,0 +1,50 @@
+#!/bin/sh
+#
+# Startup script for the Apache Web Server
+#
+# chkconfig: 345 85 15
+# description: Apache is a World Wide Web server.  It is used to serve \
+#	       HTML files and CGI.
+# processname: httpd
+# pidfile: /var/run/httpd.pid
+# config: /opt/httpd/conf/httpd.conf
+
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+# See how we were called.
+case "$1" in
+      start)
+            echo -n "Starting httpd: "
+            /srv/www/httpd/bin/apachectl start
+            echo
+            touch /var/lock/subsys/httpd
+            ;;
+      stop)
+            echo -n "Shutting down http: "
+            ps aux | grep http | grep -v grep | awk '{print $2}' | xargs kill -9
+            echo
+            rm -f /var/lock/subsys/httpd
+            rm -f /var/run/httpd.pid
+            ;;
+      status)
+           if [ -f /var/lock/subsys/httpd ]
+		then
+                  echo "HTTPD Running"
+            else
+                  echo "HTTPD not Running"
+	fi 
+;;
+      restart)
+            /srv/www/httpd/bin/apachectl stop
+            sleep 2
+            /srv/www/httpd/bin/apachectl start
+            ;;
+      *)
+      echo "Usage: $0 {start|stop|restart|reload|status}"
+      exit 1
+      esac
+
+      exit 0
+    
